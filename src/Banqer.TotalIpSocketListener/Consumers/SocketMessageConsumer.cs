@@ -38,7 +38,7 @@ public sealed class SocketMessageConsumer : IConsumer<SocketMessage>
     public async Task Consume(ConsumeContext<SocketMessage> context)
     {
         var cancellationToken = context.CancellationToken;
-        var stringContent = new StringContent(context.Message.Content);
+        using var stringContent = new StringContent(context.Message.Content);
         using var httpResponseMessage =
             await this.publishingApiClient.HttpClient.PostAsync("api/totalip/socket",
                 stringContent, cancellationToken);
