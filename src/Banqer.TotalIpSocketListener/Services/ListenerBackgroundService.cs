@@ -56,7 +56,10 @@ internal sealed class ListenerBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await this.resiliencePipeline.ExecuteAsync(ListenAndPublishSocketMessage, stoppingToken);
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            await this.resiliencePipeline.ExecuteAsync(ListenAndPublishSocketMessage, stoppingToken);
+        }
     }
 
     private async ValueTask ListenAndPublishSocketMessage(CancellationToken cancellationToken)
@@ -67,24 +70,22 @@ internal sealed class ListenerBackgroundService : BackgroundService
         {
             var remoteEndpoint = await ResolveHostEndpoint(host, port, cancellationToken);
             using var client = new Socket(remoteEndpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
             await client.ConnectAsync(remoteEndpoint, cancellationToken);
 
-            this.log.LogInformation("Socket connected to {Host}:{Port}.", remoteEndpoint.Address, remoteEndpoint.Port);
+            this.log.LogInformation("Connected to Server {Host}:{Port}.", remoteEndpoint.Address, remoteEndpoint.Port);
 
-            while (!cancellationToken.IsCancellationRequested)
+            await using var ns = new NetworkStream(client);
+            using var sr = new StreamReader(ns);
+            while (!sr.EndOfStream)
             {
-                await using var ns = new NetworkStream(client);
-                using var sr = new StreamReader(ns);
-                while (!sr.EndOfStream)
-                {
-                    var content = await sr.ReadLineAsync(cancellationToken);
+                var content = await sr.ReadLineAsync(cancellationToken);
 
-                    // Ignore empty lines.
-                    if (string.IsNullOrWhiteSpace(content))
-                        continue;
-                    this.log.LogInformation("Socket Data Received: {content}", content);
-                    await this.bus.Publish(new SocketMessage { Content = content }, cancellationToken);
-                }
+                // Ignore empty lines.
+                if (string.IsNullOrWhiteSpace(content))
+                    continue;
+                this.log.LogInformation("Data Received: {content}", content);
+                await this.bus.Publish(new SocketMessage { Content = content }, cancellationToken);
             }
         }
         catch (SocketException sex)
@@ -96,6 +97,10 @@ internal sealed class ListenerBackgroundService : BackgroundService
         {
             log.LogError("Unable to resolve server host {host}.", host);
             throw;
+        }
+        catch (OperationCanceledException)
+        {
+            log.LogInformation("Operation Canceled.");
         }
         catch (Exception ex)
         {
