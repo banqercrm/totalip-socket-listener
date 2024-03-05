@@ -1,0 +1,1 @@
+docker build -t ghcr.io/banqercrm/totalip-socket-listener:1.0.0 -f .\src\Banqer.TotalIpSocketListener\Dockerfile .

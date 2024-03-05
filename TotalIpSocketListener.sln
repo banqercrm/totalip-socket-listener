@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8ACFEEDB-B76B-4300-9D35-30146770A35E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banqer.TotalIpSocketListener", "src\Banqer.TotalIpSocketListener\Banqer.TotalIpSocketListener.csproj", "{CF4F11D4-8935-402E-BEBC-CB640E2589BF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{83CFEA6F-D89A-4737-8BA5-6B8897179ED5}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CF4F11D4-8935-402E-BEBC-CB640E2589BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF4F11D4-8935-402E-BEBC-CB640E2589BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF4F11D4-8935-402E-BEBC-CB640E2589BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF4F11D4-8935-402E-BEBC-CB640E2589BF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CF4F11D4-8935-402E-BEBC-CB640E2589BF} = {8ACFEEDB-B76B-4300-9D35-30146770A35E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C181F2F9-C5E4-4989-ACD9-E1628A56E541}
+	EndGlobalSection
+EndGlobal
