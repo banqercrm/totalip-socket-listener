@@ -77,15 +77,18 @@ internal sealed class ListenerBackgroundService : BackgroundService
 
             await using var ns = new NetworkStream(client);
             using var sr = new StreamReader(ns);
-            while (!sr.EndOfStream)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                var content = await sr.ReadLineAsync(cancellationToken);
-
-                // Ignore empty lines.
-                if (string.IsNullOrWhiteSpace(content))
-                    continue;
-                this.log.LogInformation("Data Received: {content}", content);
-                await this.bus.Publish(new SocketMessage { Content = content }, cancellationToken);
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.options.Value.SocketServerReceiveTimeout));
+                await using var _ = cancellationToken.Register(cts.Cancel);
+                while (await sr.ReadLineAsync(cts.Token) is { } content)
+                {
+                    // Ignore empty lines.
+                    if (string.IsNullOrWhiteSpace(content))
+                        continue;
+                    this.log.LogInformation("Data Received: {content}", content);
+                    await this.bus.Publish(new SocketMessage { Content = content }, cancellationToken);
+                }
             }
         }
         catch (SocketException sex)

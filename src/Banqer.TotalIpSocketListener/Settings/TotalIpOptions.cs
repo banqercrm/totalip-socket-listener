@@ -17,4 +17,6 @@ internal sealed class TotalIpOptions
 
     [Required(AllowEmptyStrings = false, ErrorMessage = $"{SectionName}:{nameof(PublishingApiBaseAddress)} is not set.")]
     public required string PublishingApiBaseAddress { get; set; }
+
+    public int SocketServerReceiveTimeout { get; set; } = 5 * 60 * 1000;
 }
