@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  totalip-socket-listener:
+    image: ghcr.io/banqercrm/totalip-socket-listener:1.0.2-alpine3.18
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    env_file:
+      - .env
+    restart: always
