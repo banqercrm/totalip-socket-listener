@@ -60,6 +60,7 @@ internal sealed class ListenerBackgroundService : BackgroundService
         {
             await this.resiliencePipeline.ExecuteAsync(ListenAndPublishSocketMessage, stoppingToken);
         }
+        this.log.LogWarning("Exit ListenerBackgroundService.");
     }
 
     private async ValueTask ListenAndPublishSocketMessage(CancellationToken cancellationToken)
@@ -74,18 +75,23 @@ internal sealed class ListenerBackgroundService : BackgroundService
             await client.ConnectAsync(remoteEndpoint, cancellationToken);
 
             this.log.LogInformation("Connected to Server {Host}:{Port}.", remoteEndpoint.Address, remoteEndpoint.Port);
-
             await using var ns = new NetworkStream(client);
             using var sr = new StreamReader(ns);
             while (!cancellationToken.IsCancellationRequested)
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.options.Value.SocketServerReceiveTimeout));
+                var tsTimeout = TimeSpan.FromSeconds(this.options.Value.SocketServerReceiveTimeout);
+                this.log.LogDebug("SocketServerReceiveTimeout: {tsTimeout}", tsTimeout);
+                using var cts = new CancellationTokenSource(tsTimeout);
                 await using var _ = cancellationToken.Register(cts.Cancel);
+                this.log.LogInformation("Enter main read loop, waiting content...");
                 while (await sr.ReadLineAsync(cts.Token) is { } content)
                 {
                     // Ignore empty lines.
                     if (string.IsNullOrWhiteSpace(content))
+                    {
+                        this.log.LogDebug("Empty line ignored.");
                         continue;
+                    }
                     this.log.LogInformation("Data Received: {content}", content);
                     await this.bus.Publish(new SocketMessage { Content = content }, cancellationToken);
                 }
