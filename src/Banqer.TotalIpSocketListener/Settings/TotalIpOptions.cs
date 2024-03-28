@@ -19,4 +19,10 @@ internal sealed class TotalIpOptions
     public required string PublishingApiBaseAddress { get; set; }
 
     public int SocketServerReceiveTimeout { get; set; } = 5 * 60;
+
+    [Required(AllowEmptyStrings = false, ErrorMessage = $"{SectionName}:{nameof(WorkingHoursStart)} is not set.")]
+    public TimeSpan WorkingHoursStart { get; set; } = TimeSpan.FromHours(8);
+
+    [Required(AllowEmptyStrings = false, ErrorMessage = $"{SectionName}:{nameof(WorkingHoursEnd)} is not set.")]
+    public TimeSpan WorkingHoursEnd { get; set; } = TimeSpan.FromHours(20);
 }

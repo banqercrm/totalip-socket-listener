@@ -14,6 +14,8 @@ var configuration = builder.Configuration;
 configuration.AddEnvironmentVariables();
 Environment.SetEnvironmentVariable("BASEDIR", AppContext.BaseDirectory);
 
+services.AddSingleton(TimeProvider.System);
+
 // Logging
 services.AddLogging(options =>
 {
